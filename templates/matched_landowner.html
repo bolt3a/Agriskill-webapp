@@ -1,0 +1,76 @@
+<!-- matched_landowner.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matched Landowners</title>
+    <style>
+        /* Add your styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .landowner {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+        }
+        .navbar a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .navbar a:hover {
+            background-color: #575757;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div><a href="landowner_home.html">Agriskill</a></div>
+    </div>
+
+    <div class="container">
+        <h2>Matched Landowners</h2>
+
+        {% if matching_landowners %}
+            {% for landowner in matching_landowners %}
+                <div class="landowner">
+                    <p><strong>Name:</strong> {{ landowner.full_name|title }}</p>
+                    <p><strong>Email:</strong> {{ landowner.email }}</p>
+                    <p><strong>Help Needed:</strong> {{ landowner.help_needed }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No matching landowners found.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>

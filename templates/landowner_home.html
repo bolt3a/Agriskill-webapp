@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landowner Home</title>
+</head>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        /* Navbar styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+        }
+        .navbar a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .navbar a:hover {
+            background-color: #575757;
+            border-radius: 5px;
+        }
+        /* Form styling */
+        .container {
+            padding: 20px;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #555;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 5px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .skill-category {
+            margin: 15px 0;
+        }
+        .skill-category h3 {
+            margin-bottom: 10px;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .skills label {
+            margin-right: 15px;
+        }
+        #resultList {
+            display: none;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .result-item {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        .result-item:hover {
+            background-color: #f1f1f1;
+        }
+</style>
+<body>
+    <div class="navbar">
+        <div><a href="#">Agriskill</a></div>
+        <div><a href="{% url 'skillshare_view' %}">SkillShare</a></div>
+    </div>
+        <div class="container">
+            <h2>Find Agricultural Assistance</h2>
+            <form id="searchForm" method="POST" action="{% url 'matched_professionals' %}">
+                {% csrf_token %}
+                <label for="district">District</label>
+                <select id="district" name="district" required onchange="populateCities()">
+                    <option value="Kollam">Kollam</option>
+                    <option value="Pathanamthitta">Pathanamthitta</option>
+                    <option value="Alappuzha">Alappuzha</option>
+                    <option value="Kottayam">Kottayam</option>
+                    <option value="Idukki">Idukki</option>
+                    <option value="Ernakulam">Ernakulam</option>
+                    <option value="Thrissur">Thrissur</option>
+                    <option value="Palakkad">Palakkad</option>
+                    <option value="Malappuram">Malappuram</option>
+                    <option value="Kozhikode">Kozhikode</option>
+                    <option value="Wayanad">Wayanad</option>
+                    <option value="Kannur">Kannur</option>
+                    <option value="Kasaragod">Kasaragod</option>
+                </select>
+
+                <label for="city">City</label>
+                <select id="city" name="city" required>
+                    <option value="">Select City</option>
+                </select>
+                <label for="total_area">Total Area (in acres)</label>
+                <input type="text" id="total_area" name="total_area" required>
+                <input type="hidden" id="skills" name="skills">
+                <label for="skills">Select Type of Help Needed (Skills)</label>
+                <button type="button" id="openModal">Choose Skills</button>
+                <div id="selectedSkills" style="margin: 15px 0;"></div>
+                <button type="submit" style="margin-top: 20px;">Search</button>
+            </form>
+            <div id="resultList">
+                {% if skilled_professionals %}
+                <h3>Matching Skilled Professionals:</h3>
+                {% for professional in skilled_professionals %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <!-- Link to landowner_results by name -->
+                            <a href="{% url 'landowner_results' professional.name %}">{{ professional.name }}</a>
+                        </h5>
+                        <p><strong>Skills:</strong> {{ professional.skills }}</p>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>No matching skilled professionals found based on the specified help needed.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Modal for Skill Selection -->
+            <div id="skillsModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Select Your Skills</h2>
+
+                    <div class="skill-category">
+                        <h3>Banana Cultivation</h3>
+                        <div class="skills">
+                            <label><input type="checkbox" name="skill_checkbox" value="Harvesting (Banana)"> Harvesting</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Land Preparation (Banana)"> Land Preparation</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Planting (Banana)"> Planting</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Weeding (Banana)"> Weeding</label>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Coconut Farming</h3>
+                        <div class="skills">
+                            <label><input type="checkbox" name="skill_checkbox" value="Harvesting (Coconut)"> Harvesting</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Land Preparation (Coconut)"> Land Preparation</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Planting of Coconut Saplings (Coconut)"> Planting of Coconut Saplings</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Post-Harvest Processing (Coconut)"> Post-Harvest Processing</label>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Paddy Cultivation</h3>
+                        <div class="skills">
+                            <label><input type="checkbox" name="skill_checkbox" value="Harvesting (Paddy)"> Harvesting</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Land Preparation (Paddy)"> Land Preparation</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Ploughing (Paddy)"> Ploughing</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Weeding (Paddy)"> Weeding</label>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Rubber Tapping</h3>
+                        <div class="skills">
+                            <label><input type="checkbox" name="skill_checkbox" value="Latex Collection (Rubber)"> Latex Collection</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Weeding (Rubber)"> Weeding</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Planting (Rubber)"> Planting</label>
+                            <label><input type="checkbox" name="skill_checkbox" value="Tapping (Rubber)"> Tapping</label>
+                        </div>
+                    </div>
+
+                    <button id="saveSkills">Save Skills</button>
+                </div>
+            </div>
+        </div>
+</body>
+<script>
+            const cities = {
+                'Kollam': ['Kollam City', 'Paravoor', 'Kottarakkara'],
+                'Pathanamthitta': ['Pathanamthitta City', 'Thiruvalla', 'Kumbazha'],
+                'Alappuzha': ['Alappuzha City', 'Cherthala', 'Ambalappuzha'],
+                'Kottayam': ['Kottayam City', 'Changanassery', 'Puthuppally'],
+                'Idukki': ['Idukki Town', 'Munnar', 'Thodupuzha'],
+                'Ernakulam': ['Kochi', 'Aluva', 'Perumbavoor'],
+                'Thrissur': ['Thrissur City', 'Chalakudy', 'Irinjalakuda'],
+                'Palakkad': ['Palakkad City', 'Kanjirappally', 'Ottapalam'],
+                'Malappuram': ['Malappuram City', 'Kondotty', 'Ponnani'],
+                'Kozhikode': ['Kozhikode City', 'Koyilandy', 'Vatakara'],
+                'Wayanad': ['Kalpetta', 'Mananthavady', 'Vythiri'],
+                'Kannur': ['Kannur City', 'Thalassery', 'Payyannur'],
+                'Kasaragod': ['Kasaragod Town', 'Parappa', 'Manjeshwaram']
+            };
+
+            function populateCities() {
+                const districtSelect = document.getElementById('district');
+                const citySelect = document.getElementById('city');
+                const selectedDistrict = districtSelect.value;
+
+                // Clear previous options
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                if (selectedDistrict in cities) {
+                    cities[selectedDistrict].forEach(function(city) {
+                        const option = document.createElement('option');
+                        option.value = city;
+                        option.textContent = city;
+                        citySelect.appendChild(option);
+                    });
+                }
+            }
+
+            document.getElementById('openModal').onclick = function() {
+                document.getElementById('skillsModal').style.display = 'block';
+            };
+
+            document.getElementsByClassName('close')[0].onclick = function() {
+                document.getElementById('skillsModal').style.display = 'none';
+            };
+
+            document.getElementById('saveSkills').onclick = function() {
+                const checkboxes = document.querySelectorAll('input[name="skill_checkbox"]:checked');
+                const selectedSkills = Array.from(checkboxes).map(checkbox => checkbox.value);
+                document.getElementById('selectedSkills').innerText = selectedSkills.join(', ');
+                document.getElementById('skills').value = selectedSkills.join(', ');
+                document.getElementById('skillsModal').style.display = 'none';
+            };
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('skillsModal');
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            };
+
+            function showDetails(name, email, phone, skills) {
+                alert(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nSkills: ${skills}`);
+            }
+</script>
+</html>

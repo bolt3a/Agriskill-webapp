@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        .profile-info {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+        .profile-info p {
+            margin: 10px 0;
+            color: #555;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Profile</h1>
+    <div class="profile-info">
+        <p><strong>Full Name:</strong> {{ user.full_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Age:</strong> {{ user.age }}</p>
+        <p><strong>Mobile Number:</strong> {{ user.mobile_number }}</p>
+        <p><strong>District:</strong> {{ user.district }}</p>
+        <p><strong>City:</strong> {{ user.city }}</p>
+
+        {% if user|hasattr:"total_area" %}
+            <p><strong>Total Area:</strong> {{ user.total_area }} acres</p>
+            <p><strong>Help Needed:</strong> {{ user.help_needed }}</p>
+        {% elif user|hasattr:"skills" %}
+            <p><strong>Skills:</strong> {{ user.skills }}</p>
+        {% endif %}
+    </div>
+    <a href="{% url 'home' %}">Back to Home</a>
+</body>
+</html>

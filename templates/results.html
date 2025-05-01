@@ -1,0 +1,77 @@
+<!-- results_page.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ddd;
+            margin: 10px 0;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Matched Skilled Professionals</h1>
+    <ul>
+        {% for professional in professionals %}
+            <li>
+                <strong>Name:</strong> {{ professional.full_name }} <br>
+                <strong>Phone Number:</strong> {{ professional.mobile_number }} <br>
+                <strong>Skills:</strong> {{ professional.skills }} <br>
+                <form action="{% url 'select_professional' professional.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit">Select This Professional</button>
+                </form>
+            </li>
+            <hr>
+        {% empty %}
+            <li>No skilled professionals match your criteria.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'landowner_home' %}">Back to Search</a>
+</body>
+</html>
